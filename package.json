@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/imissmyfriends/conveyorbelt#readme",
   "dependencies": {
-    "commander": "^9.3.0"
+    "commander": "^9.3.0",
+    "glob": "^8.0.3",
+    "listr": "^0.14.3"
   }
 }
