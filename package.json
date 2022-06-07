@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/imissmyfriends/conveyorbelt/issues"
   },
-  "homepage": "https://github.com/imissmyfriends/conveyorbelt#readme"
+  "homepage": "https://github.com/imissmyfriends/conveyorbelt#readme",
+  "dependencies": {
+    "commander": "^9.3.0"
+  }
 }
