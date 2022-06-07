@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 const { program } = require('commander');
-const surveyGMS = require('./commonds/surveygms');
+const surveyGMS = require('./commands/surveygms');
 
 program
   .command('surveygms')
