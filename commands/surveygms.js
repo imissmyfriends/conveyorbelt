@@ -24,18 +24,7 @@ function surveyGMS() {
           return {
             title: `Looking up ${file}...`,
             task: function (ctx) {
-              var readSprite = new Promise((resolve, reject) => {
-                fs.readFile(file, 'utf8', (err, data) => {
-                  if (err) {
-                    reject(new Error(`Error reading file from disk: ${err}`));
-                  } else {
-                    var sprite = getSpriteData(data);
-                    ctx.spriteDetails[sprite.name] = getSpriteDetails(sprite);
-                    resolve(ctx);
-                  }
-                });
-              });
-              return readSprite;
+              return getSpriteReader(ctx, file);
             }
           };
         })
@@ -48,13 +37,6 @@ function surveyGMS() {
         console.log(ctx.spriteDetails);
       }
     }
-    // Check sprites directory exists
-    // List sprites
-    // Check each sprite
-      // Load JSON
-      // See filename
-      // See layer filename
-      // Check if it is an animation
   ]);
   tasks.run().catch(err => {
     console.error(err);
@@ -70,9 +52,10 @@ function checkSpritesDirExists() {
 }
 
 function getSpriteDirectories(ctx) {
-    return getGlobPromise("sprites/*/*.yy", "No sprites found").then(function (files) {
-      ctx.files = files;
-    });
+    return getGlobPromise("sprites/*/*.yy", "No sprites found")
+      .then(function (files) {
+        ctx.files = files;
+      });
 }
 
 function getGlobPromise(globMatch, errorText) {
@@ -88,6 +71,21 @@ function getGlobPromise(globMatch, errorText) {
     });
   })
   return checkProject;
+}
+
+function getSpriteReader(ctx, file) {
+  var readSprite = new Promise((resolve, reject) => {
+    fs.readFile(file, 'utf8', (err, data) => {
+      if (err) {
+        reject(new Error(`Error reading file from disk: ${err}`));
+      } else {
+        var sprite = getSpriteData(data);
+        ctx.spriteDetails[sprite.name] = getSpriteDetails(sprite);
+        resolve(ctx);
+      }
+    });
+  });
+  return readSprite;
 }
 
 function getSpriteData(data) {
