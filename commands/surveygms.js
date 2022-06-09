@@ -2,6 +2,10 @@ const Listr = require('listr');
 const fs = require('fs');
 var glob = require("glob")
 
+const SPRITES_DIR = "sprites/"
+const ART_DIR = "art/"
+const ASEPRITE = "~/Library/Application\ Support/Steam/steamapps/common/Aseprite/Aseprite.app/Contents/MacOS/aseprite";
+
 function surveyGMS() {
   const tasks = new Listr([
     {
@@ -17,25 +21,31 @@ function surveyGMS() {
       task: getSpriteDirectories
     },
     {
-      title: "Look into sprites",
-      task: function (ctx) {
+      title: "Collect sprite data",
+      task: function (ctx, task) {
         ctx.spriteDetails = {};
         var subTasks = ctx.files.map(file => {
           return {
             title: `Looking up ${file}...`,
-            task: function (ctx) {
+            task: function (ctx, task) {
               return getSpriteReader(ctx, file);
+              task.output = 'hi';
             }
           };
         })
+        task.output ='hi';
         return new Listr(subTasks)
       }
     },
     {
       title: "Show sprite info",
       task: function (ctx) {
-        console.log(ctx.spriteDetails);
+        //console.log(ctx.spriteDetails);
       }
+    },
+    {
+      title: "Look up PNGs in art directory",
+      task: getArtPNGs
     }
   ]);
   tasks.run().catch(err => {
@@ -43,21 +53,23 @@ function surveyGMS() {
   });
 }
 
+// Check project
 function checkYYPFileExists() {
   return getGlobPromise("*.yyp", "No .yyp file");
 }
 
 function checkSpritesDirExists() {
-  return getGlobPromise("sprites/", "No sprites directory");
+  return getGlobPromise(SPRITES_DIR, "No sprites directory");
 }
 
 function getSpriteDirectories(ctx) {
-    return getGlobPromise("sprites/*/*.yy", "No sprites found")
+    return getGlobPromise(SPRITES_DIR+"*/*.yy", "No sprites found")
       .then(function (files) {
         ctx.files = files;
       });
 }
 
+// Get sprites
 function getGlobPromise(globMatch, errorText) {
   var checkProject = new Promise((resolve, reject) => {
     glob(globMatch, function (error, files) {
@@ -73,6 +85,7 @@ function getGlobPromise(globMatch, errorText) {
   return checkProject;
 }
 
+// Get sprite information
 function getSpriteReader(ctx, file) {
   var readSprite = new Promise((resolve, reject) => {
     fs.readFile(file, 'utf8', (err, data) => {
@@ -113,6 +126,16 @@ function getSpriteDetails(sprite) {
       layerName: sprite.layers[0].name
     }
   }
+}
+
+
+// Getting art PNGs
+function getArtPNGs(ctx) {
+    return getGlobPromise(ART_DIR+"**/*.aseprite", "No PNGs found")
+      .then(function (pngs) {
+        ctx.pngs = pngs;
+        console.log(pngs);
+      });
 }
 
 module.exports = surveyGMS;
