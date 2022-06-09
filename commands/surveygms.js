@@ -1,10 +1,13 @@
 const Listr = require('listr');
+const path = require('path');
+const { exec } = require('child_process');
 const fs = require('fs');
 var glob = require("glob")
 
-const SPRITES_DIR = "sprites/"
-const ART_DIR = "art/"
-const ASEPRITE = "~/Library/Application\ Support/Steam/steamapps/common/Aseprite/Aseprite.app/Contents/MacOS/aseprite";
+const SPRITES_DIR = "sprites/";
+const ART_DIR = "art/";
+const ASEPRITE_PATH = "~/Library/Application\\ Support/Steam/steamapps/common/Aseprite/Aseprite.app/Contents/MacOS/aseprite";
+const PREFIX = "s";
 
 function surveyGMS() {
   const tasks = new Listr([
@@ -132,9 +135,36 @@ function getSpriteDetails(sprite) {
 // Getting art PNGs
 function getArtPNGs(ctx) {
     return getGlobPromise(ART_DIR+"**/*.aseprite", "No PNGs found")
-      .then(function (pngs) {
-        ctx.pngs = pngs;
-        console.log(pngs);
+      .then(function (ases) {
+        ctx.ases = ases;
+        let index = 2;
+        let name = path.basename(ases[index],'.aseprite');
+        let dir = path.dirname(ases[index]);
+
+        var command = [
+          ASEPRITE_PATH,
+          '-b',
+          ases[index],
+          '--save-as',
+          dir+'/'+PREFIX+name+'{tag}.png'
+        ].join( " " );
+
+        console.log(command);
+
+        exec(command,(error, stdout, stderr) => {
+          if (error) {
+            console.error(`error: ${error.message}`);
+            return;
+          }
+
+          if (stderr) {
+            console.error(`stderr: ${stderr}`);
+            return;
+          }
+
+          console.log(`stdout:\n${stdout}`);
+        });
+
       });
 }
 
