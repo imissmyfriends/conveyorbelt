@@ -49,7 +49,7 @@ function surveyGMS() {
       }
     },
     {
-      title: "Look up PNGs in art directory",
+      title: "Look up Aseprite files in art directory",
       task: getAsepriteFiles
     },
     {
@@ -64,7 +64,7 @@ function surveyGMS() {
     },
     {
       title: "Watching files",
-      task: () => {
+      task: (ctx) => {
         return new Observable(observer => {
           observer.next('Watching…');
 
@@ -74,6 +74,7 @@ function surveyGMS() {
             observer.next('Updated: ' + path);
             exportFromAseprite(path).then(function () {
               observer.next('Exported: ' + path);
+              findGMSSpriteFromAseprite(path, ctx, observer);
             });
           })
           //observer.complete();
@@ -227,6 +228,54 @@ function exportFromAseprite(filePath) {
     });
   });
   return exporter;
+}
+
+
+function findGMSSpriteFromAseprite(filePath, ctx, observer) {
+  let name = path.basename(filePath,'.aseprite');
+  let dir = path.dirname(filePath);
+  let globMatch = dir+'/'+PREFIX+name+'-*.png';
+  glob(globMatch, function (error, files) {
+    if (files.length === 1) { // Single sprite
+      let pngName = path.basename(files[0],'.png');
+      let pngPath = dir + `/` + pngName + '.png';
+      let spriteName = pngName.split('-')[0];
+      let spriteImgName = ctx.spriteDetails[spriteName].imgName
+      let spriteImgPath  = [
+        SPRITES_DIR,
+        spriteName,'/',
+        spriteImgName,'.png'
+      ].join('');
+      let spriteLayerImgName = ctx.spriteDetails[spriteName].layerName;
+      let spriteLayerImgPath = [
+        SPRITES_DIR,
+        spriteName,'/',
+        'layers/',
+        spriteImgName,'/',
+        spriteLayerImgName, '.png'
+      ].join('');
+
+      var pngBuf = fs.readFileSync(pngPath)
+      var gmsBuf = fs.readFileSync(spriteImgPath)
+      if (pngBuf.equals(gmsBuf)) {
+        observer.next('No update. Watching…')
+      } else {
+        fs.copyFile(pngPath, spriteImgPath, function (error) {
+          if (error) throw new Error(error);
+          observer.next('Updated in GMS: ' + spriteName);
+        });
+        fs.copyFile(pngPath, spriteLayerImgPath, function (error) {
+          if (error) throw new Error(error);
+          observer.next('Updated in GMS: ' + spriteName);
+        });
+      }
+    } else { // Animation
+
+    }
+    //console.log(files);
+    //observer.next(globMatch);
+    //observer.next(files[0]);
+  });
 }
 
 module.exports = surveyGMS;
