@@ -43,13 +43,19 @@ function surveyGMS() {
     {
       title: "Show sprite info",
       task: function (ctx) {
-        //console.log(ctx.spriteDetails);
+        console.log(ctx.spriteDetails);
       }
     },
     {
       title: "Look up PNGs in art directory",
-      task: getArtPNGs
-    }
+      task: getAsepriteFiles
+    },
+    {
+      title: "Show Aseprite info",
+      task: function (ctx) {
+        console.log(ctx.ases);
+      }
+    },
   ]);
   tasks.run().catch(err => {
     console.error(err);
@@ -131,14 +137,12 @@ function getSpriteDetails(sprite) {
   }
 }
 
-
-// Getting art PNGs
-function getArtPNGs(ctx) {
-    return getGlobPromise(ART_DIR+"**/*.aseprite", "No PNGs found")
-      .then(function (ases) {
-        ctx.ases = ases;
-        exportFromAseprite(ases[0]);
-      });
+// Getting Aseprite files
+function getAsepriteFiles(ctx) {
+  return getGlobPromise(ART_DIR+"**/*.aseprite", "No PNGs found")
+    .then(function (ases) {
+      ctx.ases = ases;
+    });
 }
 
 function exportFromAseprite(filePath) {

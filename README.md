@@ -12,4 +12,9 @@
   - ~/Library/ApplicationSupport/Steam/steamapps/common/Aseprite/Aseprite.app/Contents/MacOS/aseprite (Steam)
 
 ## Convention
-- The
+- Aseprite file names need to match the sprite names in GameMaker (except the `PREFIX`, see configuration `TODO LINK`)
+- The animation tag names will be suffixed after the file name
+
+`TODO add image of alo animation timeline and the file that'll come out of it`
+
+- Something about how certain layers can be exported
