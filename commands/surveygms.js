@@ -87,23 +87,14 @@ function surveyGMS() {
   });
 }
 
-// Check project
-function checkYYPFileExists() {
-  return getGlobPromise("*.yyp", "No .yyp file");
-}
-
-function checkSpritesDirExists() {
-  return getGlobPromise(SPRITES_DIR, "No sprites directory");
-}
-
-function getSpriteDirectories(ctx) {
-    return getGlobPromise(SPRITES_DIR+"*/*.yy", "No sprites found")
-      .then(function (files) {
-        ctx.files = files;
-      });
-}
-
-// Get sprites
+// UTILITIES
+/**
+ * Wraps a `glob` call with a Promise.
+ *
+ * @param {string} globMatch - The glob to match
+ * @param {string} errorText - The error that the Promise should return
+ * @returns {Promise}
+ */
 function getGlobPromise(globMatch, errorText) {
   var checkProject = new Promise((resolve, reject) => {
     glob(globMatch, function (error, files) {
@@ -119,14 +110,51 @@ function getGlobPromise(globMatch, errorText) {
   return checkProject;
 }
 
-// Get sprite information
+
+// PROJECT
+
+/**
+ * Checks if a YYP file exists where the script is being run
+ *
+ * @returns {Promise}
+ */
+function checkYYPFileExists() {
+  return getGlobPromise("*.yyp", "No .yyp file");
+}
+
+/**
+ * Checks if the sprites directory exists where the script is being run
+ *
+ * @returns {Promise}
+ */
+function checkSpritesDirExists() {
+  return getGlobPromise(SPRITES_DIR, "No sprites directory");
+}
+
+// SPRITES
+
+/**
+ * Goes through the sprites directory and puts all the `yy` files
+ * in `files` inside of `ctx`.
+ *
+ * @param ctx - This is where the files are added
+ * @returns {Promise}
+ */
+function getSpriteDirectories(ctx) {
+    return getGlobPromise(SPRITES_DIR+"*/*.yy", "No sprites found")
+      .then(function (files) {
+        ctx.files = files;
+      });
+}
+
+
 function getSpriteReader(ctx, file) {
   var readSprite = new Promise((resolve, reject) => {
-    fs.readFile(file, 'utf8', (err, data) => {
+    fs.readFile(file, 'utf8', (err, json) => {
       if (err) {
         reject(new Error(`Error reading file from disk: ${err}`));
       } else {
-        var sprite = getSpriteData(data);
+        var sprite = parseSpriteJSON(json);
         ctx.spriteDetails[sprite.name] = getSpriteDetails(sprite);
         resolve(ctx);
       }
@@ -135,15 +163,27 @@ function getSpriteReader(ctx, file) {
   return readSprite;
 }
 
-function getSpriteData(data) {
+/**
+ * Parses the `yy` JSON format and returns it
+ *
+ * @params {string} json - JSON of the yy file
+ * @returns {Object}
+ */
+function parseSpriteJSON(json) {
   // Remove trailing commas
   let regex = /\,(?!\s*?[\{\[\"\'\w])/g;
-  let correctData = data.replace(regex, '');
+  let correctData = json.replace(regex, '');
 
   // parse JSON string to JSON object
   return JSON.parse(correctData);
 }
 
+/**
+ * Gets the image and layer name details from a sprite.
+ *
+ * @params {Object} sprite - Parsed sprite data
+ * @returns {Object} Object with `imgName(s)` and `layerName(s)`
+ */
 function getSpriteDetails(sprite) {
   if (sprite.frames.length === 1 ) {
     return {
