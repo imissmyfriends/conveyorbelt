@@ -142,6 +142,13 @@ function getSpriteDetails(sprite) {
 }
 
 // Getting Aseprite files
+
+/**
+ * Looks into the `ART_DIR` and finds all Aseprite files
+ *
+ * @param ctx
+ * @returns {Promise}
+ */
 function getAsepriteFiles(ctx) {
   return getGlobPromise(ART_DIR+"**/*.aseprite", "No PNGs found")
     .then(function (ases) {
@@ -149,7 +156,13 @@ function getAsepriteFiles(ctx) {
     });
 }
 
-function exportAllAsepriteToPng(ctx, task) {
+/**
+ * Creates tasks to export all Aseprite files that are in the
+ * `ctx`.
+ * @params ctx
+ * @returns {Listr}
+ */
+function exportAllAsepriteToPng(ctx) {
   var subTasks = ctx.ases.map(ase => {
     return {
       title: `Exporting ${ase}...`,
@@ -161,6 +174,14 @@ function exportAllAsepriteToPng(ctx, task) {
   return new Listr(subTasks)
 }
 
+/**
+ * Exports PNGs from an Aseprite file. The output differs
+ * based on whether the file is an animation or has exportable
+ * layers.
+ *
+ * @param {string} filePath - Path to aseprite file
+ * @returns {Promise}
+ */
 function exportFromAseprite(filePath) {
   var exporter = new Promise((resolve, reject) => {
     let name = path.basename(filePath,'.aseprite');
