@@ -1,5 +1,6 @@
 const Listr = require('listr');
 const {Observable} = require('rxjs');
+const chokidar = require('chokidar');
 const path = require('path');
 const { exec } = require('child_process');
 const fs = require('fs');
@@ -44,7 +45,7 @@ function surveyGMS() {
     {
       title: "Show sprite info",
       task: function (ctx) {
-        console.log(ctx.spriteDetails);
+        //console.log(ctx.spriteDetails);
       }
     },
     {
@@ -54,7 +55,7 @@ function surveyGMS() {
     {
       title: "Show Aseprite info",
       task: function (ctx) {
-        console.log(ctx.ases);
+        //console.log(ctx.ases);
       }
     },
     {
@@ -66,7 +67,16 @@ function surveyGMS() {
       task: () => {
         return new Observable(observer => {
           observer.next('Watching…');
-          observer.complete();
+
+          const watcher = chokidar.watch(ART_DIR+'**/*.aseprite');
+
+          watcher.on('change', (path) => {
+            observer.next('Updated: ' + path);
+            exportFromAseprite(path).then(function () {
+              observer.next('Exported: ' + path);
+            });
+          })
+          //observer.complete();
         });
       }
     }

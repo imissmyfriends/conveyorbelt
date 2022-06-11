@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/imissmyfriends/conveyorbelt#readme",
   "dependencies": {
+    "chokidar": "^3.5.3",
     "commander": "^9.3.0",
     "glob": "^8.0.3",
     "listr": "^0.14.3",
