@@ -258,7 +258,7 @@ function findGMSSpriteFromAseprite(filePath, ctx, observer) {
       var pngBuf = fs.readFileSync(pngPath)
       var gmsBuf = fs.readFileSync(spriteImgPath)
       if (pngBuf.equals(gmsBuf)) {
-        observer.next('No update. Watching…')
+        observer.next('No change in: ' + spriteName)
       } else {
         fs.copyFile(pngPath, spriteImgPath, function (error) {
           if (error) throw new Error(error);
