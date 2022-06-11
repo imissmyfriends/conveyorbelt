@@ -56,6 +56,10 @@ function surveyGMS() {
         console.log(ctx.ases);
       }
     },
+    {
+      title: "Export Aseprite files to PNG",
+      task: exportAllAsepriteToPng
+    },
   ]);
   tasks.run().catch(err => {
     console.error(err);
@@ -145,30 +149,43 @@ function getAsepriteFiles(ctx) {
     });
 }
 
+function exportAllAsepriteToPng(ctx, task) {
+  var subTasks = ctx.ases.map(ase => {
+    return {
+      title: `Exporting ${ase}...`,
+      task: function (ctx, task) {
+        return exportFromAseprite(ase);
+      }
+    };
+  })
+  return new Listr(subTasks)
+}
+
 function exportFromAseprite(filePath) {
-  let name = path.basename(filePath,'.aseprite');
-  let dir = path.dirname(filePath);
-  let command = [
-    ASEPRITE_PATH,
-    '-b',
-    filePath,
-    '--save-as',
-    dir+'/'+PREFIX+name+'{tag}.png'
-  ].join( " " );
+  var exporter = new Promise((resolve, reject) => {
+    let name = path.basename(filePath,'.aseprite');
+    let dir = path.dirname(filePath);
+    let command = [
+      ASEPRITE_PATH,
+      '-b',
+      filePath,
+      '--save-as',
+      dir+'/'+PREFIX+name+'{tag}-{frame001}.png'
+    ].join( " " );
 
-  exec(command,(error, stdout, stderr) => {
-    if (error) {
-      console.error(`error: ${error.message}`);
-      return;
-    }
+    exec(command,(error, stdout, stderr) => {
+      if (error) {
+        reject(`error: ${error.message}`);
+      }
 
-    if (stderr) {
-      console.error(`stderr: ${stderr}`);
-      return;
-    }
+      if (stderr) {
+        reject(`stderr: ${stderr}`);
+      }
 
-    console.log(`stdout:\n${stdout}`);
+      resolve(`stdout:\n${stdout}`);
+    });
   });
+  return exporter;
 }
 
 module.exports = surveyGMS;
