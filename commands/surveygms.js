@@ -1,4 +1,5 @@
 const Listr = require('listr');
+const {Observable} = require('rxjs');
 const path = require('path');
 const { exec } = require('child_process');
 const fs = require('fs');
@@ -60,6 +61,15 @@ function surveyGMS() {
       title: "Export Aseprite files to PNG",
       task: exportAllAsepriteToPng
     },
+    {
+      title: "Watching files",
+      task: () => {
+        return new Observable(observer => {
+          observer.next('Watching…');
+          observer.complete();
+        });
+      }
+    }
   ]);
   tasks.run().catch(err => {
     console.error(err);
