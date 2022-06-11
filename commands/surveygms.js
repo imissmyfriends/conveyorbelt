@@ -137,35 +137,34 @@ function getArtPNGs(ctx) {
     return getGlobPromise(ART_DIR+"**/*.aseprite", "No PNGs found")
       .then(function (ases) {
         ctx.ases = ases;
-        let index = 2;
-        let name = path.basename(ases[index],'.aseprite');
-        let dir = path.dirname(ases[index]);
-
-        var command = [
-          ASEPRITE_PATH,
-          '-b',
-          ases[index],
-          '--save-as',
-          dir+'/'+PREFIX+name+'{tag}.png'
-        ].join( " " );
-
-        console.log(command);
-
-        exec(command,(error, stdout, stderr) => {
-          if (error) {
-            console.error(`error: ${error.message}`);
-            return;
-          }
-
-          if (stderr) {
-            console.error(`stderr: ${stderr}`);
-            return;
-          }
-
-          console.log(`stdout:\n${stdout}`);
-        });
-
+        exportFromAseprite(ases[0]);
       });
+}
+
+function exportFromAseprite(filePath) {
+  let name = path.basename(filePath,'.aseprite');
+  let dir = path.dirname(filePath);
+  let command = [
+    ASEPRITE_PATH,
+    '-b',
+    filePath,
+    '--save-as',
+    dir+'/'+PREFIX+name+'{tag}.png'
+  ].join( " " );
+
+  exec(command,(error, stdout, stderr) => {
+    if (error) {
+      console.error(`error: ${error.message}`);
+      return;
+    }
+
+    if (stderr) {
+      console.error(`stderr: ${stderr}`);
+      return;
+    }
+
+    console.log(`stdout:\n${stdout}`);
+  });
 }
 
 module.exports = surveyGMS;
