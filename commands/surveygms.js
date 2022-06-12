@@ -147,6 +147,13 @@ function getSpriteDirectories(ctx) {
       });
 }
 
+/**
+ * Collects sprites data for all the `files` in `ctx` and puts
+ * it in `spriteDetails`.
+ *
+ * @param ctx
+ * @returns {Listr}
+ */
 function collectSpriteData(ctx) {
   ctx.spriteDetails = {};
   var subTasks = ctx.files.map(file => {
@@ -160,7 +167,14 @@ function collectSpriteData(ctx) {
   return new Listr(subTasks)
 }
 
-
+/**
+ * Reads the sprite file, parses it, gets its details and puts them
+ * in the `ctx`
+ *
+ * @param ctx
+ * @param file - to be read
+ * @returns {Promise}
+ */
 function getSpriteReader(ctx, file) {
   var readSprite = new Promise((resolve, reject) => {
     fs.readFile(file, 'utf8', (err, json) => {
