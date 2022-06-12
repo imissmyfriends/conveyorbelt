@@ -14,6 +14,10 @@ const PREFIX = "s";
 function surveyGMS() {
   const tasks = new Listr([
     {
+      title: "Check if git repo exists",
+      task: checkGitExists
+    },
+    {
       title: "Check YYP file exists",
       task: checkYYPFileExists
     },
@@ -112,6 +116,15 @@ function getGlobPromise(globMatch, errorText) {
 
 
 // PROJECT
+
+/**
+ * Checks if a `.git` exists where the script is being run
+ *
+ * @returns {Promise}
+ */
+function checkGitExists() {
+  return getGlobPromise(".git/", "No .git directory. Please setup a git repo first");
+}
 
 /**
  * Checks if a YYP file exists where the script is being run
