@@ -4,7 +4,8 @@
   "description": "Aseprite sprites to GameMaker",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "doc": "jsdoc2md commands/surveygms.js >> DOC.md"
   },
   "bin": {
     "conveyorbelt": "./index.js"
@@ -26,5 +27,8 @@
     "listr": "^0.14.3",
     "path": "^0.12.7",
     "rxjs": "^7.5.5"
+  },
+  "devDependencies": {
+    "jsdoc-to-markdown": "^7.1.1"
   }
 }
