@@ -31,20 +31,7 @@ function surveyGMS() {
     },
     {
       title: "Collect sprite data",
-      task: function (ctx, task) {
-        ctx.spriteDetails = {};
-        var subTasks = ctx.files.map(file => {
-          return {
-            title: `Looking up ${file}...`,
-            task: function (ctx, task) {
-              return getSpriteReader(ctx, file);
-              task.output = 'hi';
-            }
-          };
-        })
-        task.output ='hi';
-        return new Listr(subTasks)
-      }
+      task: collectSpriteData
     },
     {
       title: "Show sprite info",
@@ -158,6 +145,19 @@ function getSpriteDirectories(ctx) {
       .then(function (files) {
         ctx.files = files;
       });
+}
+
+function collectSpriteData(ctx) {
+  ctx.spriteDetails = {};
+  var subTasks = ctx.files.map(file => {
+    return {
+      title: `Looking up ${file}...`,
+      task: function (ctx, task) {
+        return getSpriteReader(ctx, file);
+      }
+    };
+  })
+  return new Listr(subTasks)
 }
 
 
