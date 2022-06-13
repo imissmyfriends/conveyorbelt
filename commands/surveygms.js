@@ -59,8 +59,7 @@ function surveyGMS() {
         return new Observable(observer => {
           observer.next('Watching…');
 
-          const watcher = chokidar.watch(ART_DIR+'**/*.aseprite');
-
+          const watcher = chokidar.watch(`${ART_DIR}**/*.aseprite`);
           watcher.on('change', (path) => {
             observer.next('Updated: ' + path);
             exportFromAseprite(path).then(function () {
@@ -68,7 +67,9 @@ function surveyGMS() {
               findGMSSpriteFromAseprite(path, ctx, observer);
             });
           })
-          //observer.complete();
+
+          // Never call this, let the user stop the program
+          // observer.complete();
         });
       }
     }
