@@ -37,8 +37,7 @@ function run() {
     {
       title: "Get sprites",
       task: function (ctx) {
-        return getGlobPromise(SPRITES_DIR+"*/*.yy", "No sprites found")
-        .then(function (files) {
+        return getGlobPromise(SPRITES_DIR+"*/*.yy", "No sprites found").then((files) => {
           ctx.files = files;
         });
       }
@@ -48,19 +47,13 @@ function run() {
       task: collectSpriteData
     },
     {
-      title: "Show sprite info",
-      task: function (ctx) {
-        //console.log(ctx.spriteDetails);
-      }
-    },
-    {
       title: "Look up Aseprite files in art directory",
-      task: getAsepriteFiles
-    },
-    {
-      title: "Show Aseprite info",
       task: function (ctx) {
-        //console.log(ctx.ases);
+        // console.log(ctx.spriteDetails);
+        return getGlobPromise(ART_DIR+"**/*.aseprite", "No PNGs found").then((ases) => {
+          ctx.ases = ases;
+          // console.log(ases);
+        });
       }
     },
     {
@@ -95,18 +88,6 @@ function run() {
 
 // Getting Aseprite files
 
-/**
-* Looks into the `ART_DIR` and finds all Aseprite files
-*
-* @param ctx
-* @returns {Promise}
-*/
-function getAsepriteFiles(ctx) {
-  return getGlobPromise(ART_DIR+"**/*.aseprite", "No PNGs found")
-  .then(function (ases) {
-    ctx.ases = ases;
-  });
-}
 
 /**
 * Creates tasks to export all Aseprite files that are in the
