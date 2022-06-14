@@ -4,7 +4,7 @@
   "description": "Aseprite sprites to GameMaker",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --watch",
     "doc": "jsdoc2md commands/surveygms.js >> DOC.md"
   },
   "bin": {
