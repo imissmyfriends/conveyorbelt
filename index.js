@@ -1,10 +1,9 @@
 #! /usr/bin/env node
 const { program } = require('commander');
-const surveyGMS = require('./commands/surveygms');
+const run = require('./commands/run');
 
 program
-  .command('surveygms')
-  .description('Surveys the sprites that are currently in GMS')
-  .action(surveyGMS);
+  .command('run')
+  .action(run);
 
 program.parse();

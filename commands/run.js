@@ -11,7 +11,7 @@ const ART_DIR = "art/";
 const ASEPRITE_PATH = "~/Library/Application\\ Support/Steam/steamapps/common/Aseprite/Aseprite.app/Contents/MacOS/aseprite";
 const PREFIX = "s";
 
-function surveyGMS() {
+function run() {
   const tasks = new Listr([
     {
       title: "Check if git repo exists",
@@ -346,4 +346,4 @@ function findGMSSpriteFromAseprite(filePath, ctx, observer) {
   });
 }
 
-module.exports = surveyGMS;
+module.exports = run;
