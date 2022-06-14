@@ -1,10 +1,6 @@
 const path = require('path');
 const { exec } = require('child_process');
 
-const ASEPRITE_PATH = "~/Library/Application\\ Support/Steam/steamapps/common/Aseprite/Aseprite.app/Contents/MacOS/aseprite";
-const PREFIX = "s";
-
-
 /**
 * Exports PNGs from an Aseprite file. The output differs
 * based on whether the file is an animation or has exportable
@@ -13,16 +9,16 @@ const PREFIX = "s";
 * @param {string} filePath - Path to aseprite file
 * @returns {Promise}
 */
-function exportFromAseprite(filePath) {
+function exportFromAseprite(ctx, filePath) {
   var exporter = new Promise((resolve, reject) => {
     let name = path.basename(filePath, '.aseprite');
     let dir = path.dirname(filePath);
     let command = [
-      ASEPRITE_PATH,
+      ctx.ASEPRITE_PATH,
       '-b',
       filePath,
       '--save-as',
-      dir + '/' + PREFIX + name + '{tag}-{frame001}.png'
+      dir + '/' + ctx.PREFIX + name + '{tag}-{frame001}.png'
     ].join(" ");
 
     exec(command, (error, stdout, stderr) => {

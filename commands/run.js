@@ -7,15 +7,17 @@ const collectSpriteData = require("./collectSpriteData");
 const exportFromAseprite = require("./exportFromAseprite");
 const findGMSSpriteFromAseprite = require("./findGMSSpriteFromAseprite");
 
-const SPRITES_DIR = "sprites/";
-const ART_DIR = "art/";
-const ASEPRITE_PATH = "~/Library/Application\\ Support/Steam/steamapps/common/Aseprite/Aseprite.app/Contents/MacOS/aseprite";
-const PREFIX = "s";
-
-
-
-function run() {
+function run(options) {
   const tasks = new Listr([
+    {
+      title: "Initializing context",
+      task: function (ctx) {
+        ctx.SPRITES_DIR = options.spritesDir;
+        ctx.ART_DIR = options.artDir;
+        ctx.ASEPRITE_PATH = options.asepritePath;
+        ctx.PREFIX = options.prefix;
+      }
+    },
     {
       title: "Check if git repo exists",
       task: function () {
@@ -30,14 +32,14 @@ function run() {
     },
     {
       title: "Check sprites directory exists",
-      task: function () {
-        return getGlobPromise(SPRITES_DIR, "No sprites directory");
+      task: function (ctx) {
+        return getGlobPromise(ctx.SPRITES_DIR, "No sprites directory");
       }
     },
     {
       title: "Get sprites",
       task: function (ctx) {
-        return getGlobPromise(SPRITES_DIR+"*/*.yy", "No sprites found").then((files) => {
+        return getGlobPromise(ctx.SPRITES_DIR+"*/*.yy", "No sprites found").then((files) => {
           ctx.files = files;
         });
       }
@@ -50,7 +52,7 @@ function run() {
       title: "Look up Aseprite files in art directory",
       task: function (ctx) {
         // console.log(ctx.spriteDetails);
-        return getGlobPromise(ART_DIR+"**/*.aseprite", "No PNGs found").then((ases) => {
+        return getGlobPromise(ctx.ART_DIR+"**/*.aseprite", "No PNGs found").then((ases) => {
           ctx.ases = ases;
           // console.log(ases);
         });
@@ -63,7 +65,7 @@ function run() {
           return {
             title: `Exporting ${ase}...`,
             task: function (ctx, task) {
-              return exportFromAseprite(ase);
+              return exportFromAseprite(ctx, ase);
             }
           };
         })
@@ -76,7 +78,7 @@ function run() {
         return new Observable(observer => {
           observer.next('Watching…');
           
-          const watcher = chokidar.watch(`${ART_DIR}**/*.aseprite`);
+          const watcher = chokidar.watch(`${ctx.ART_DIR}**/*.aseprite`);
           watcher.on('change', (path) => {
             observer.next('Updated: ' + path);
             exportFromAseprite(path).then(function () {

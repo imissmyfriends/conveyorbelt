@@ -2,14 +2,11 @@ const path = require('path');
 const fs = require('fs');
 var glob = require("glob");
 
-const PREFIX = "s";
-const SPRITES_DIR = "sprites/";
-
 // Getting Aseprite files
 function findGMSSpriteFromAseprite(filePath, ctx, observer) {
   let name = path.basename(filePath, '.aseprite');
   let dir = path.dirname(filePath);
-  let globMatch = dir + '/' + PREFIX + name + '-*.png';
+  let globMatch = dir + '/' + ctx.PREFIX + name + '-*.png';
   glob(globMatch, function (error, files) {
     if (files.length === 1) { // Single sprite
       let pngName = path.basename(files[0], '.png');
@@ -17,13 +14,13 @@ function findGMSSpriteFromAseprite(filePath, ctx, observer) {
       let spriteName = pngName.split('-')[0];
       let spriteImgName = ctx.spriteDetails[spriteName].imgName;
       let spriteImgPath = [
-        SPRITES_DIR,
+        ctx.SPRITES_DIR,
         spriteName, '/',
         spriteImgName, '.png'
       ].join('');
       let spriteLayerImgName = ctx.spriteDetails[spriteName].layerName;
       let spriteLayerImgPath = [
-        SPRITES_DIR,
+        ctx.SPRITES_DIR,
         spriteName, '/',
         'layers/',
         spriteImgName, '/',
