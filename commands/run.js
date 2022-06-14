@@ -2,17 +2,18 @@ const Listr = require('listr');
 const {Observable} = require('rxjs');
 const chokidar = require('chokidar');
 const path = require('path');
-const { exec } = require('child_process');
 const fs = require('fs');
 var glob = require("glob");
 
 const getGlobPromise = require('./utils/getGlobPromise');
 const collectSpriteData = require("./collectSpriteData");
+const exportFromAseprite = require("./exportFromAseprite");
 
 const SPRITES_DIR = "sprites/";
 const ART_DIR = "art/";
 const ASEPRITE_PATH = "~/Library/Application\\ Support/Steam/steamapps/common/Aseprite/Aseprite.app/Contents/MacOS/aseprite";
 const PREFIX = "s";
+
 
 function run() {
   const tasks = new Listr([
@@ -58,7 +59,17 @@ function run() {
     },
     {
       title: "Export Aseprite files to PNG",
-      task: exportAllAsepriteToPng
+      task: function (ctx) {
+        var subTasks = ctx.ases.map(ase => {
+          return {
+            title: `Exporting ${ase}...`,
+            task: function (ctx, task) {
+              return exportFromAseprite(ase);
+            }
+          };
+        })
+        return new Listr(subTasks)
+      }
     },
     {
       title: "Watching files",
@@ -81,66 +92,13 @@ function run() {
       }
     }
   ]);
+  
   tasks.run().catch(err => {
     console.error(err);
   });
 }
 
 // Getting Aseprite files
-
-
-/**
-* Creates tasks to export all Aseprite files that are in the
-* `ctx`.
-* @params ctx
-* @returns {Listr}
-*/
-function exportAllAsepriteToPng(ctx) {
-  var subTasks = ctx.ases.map(ase => {
-    return {
-      title: `Exporting ${ase}...`,
-      task: function (ctx, task) {
-        return exportFromAseprite(ase);
-      }
-    };
-  })
-  return new Listr(subTasks)
-}
-
-/**
-* Exports PNGs from an Aseprite file. The output differs
-* based on whether the file is an animation or has exportable
-* layers.
-*
-* @param {string} filePath - Path to aseprite file
-* @returns {Promise}
-*/
-function exportFromAseprite(filePath) {
-  var exporter = new Promise((resolve, reject) => {
-    let name = path.basename(filePath,'.aseprite');
-    let dir = path.dirname(filePath);
-    let command = [
-      ASEPRITE_PATH,
-      '-b',
-      filePath,
-      '--save-as',
-      dir+'/'+PREFIX+name+'{tag}-{frame001}.png'
-    ].join( " " );
-    
-    exec(command,(error, stdout, stderr) => {
-      if (error) {
-        reject(`error: ${error.message}`);
-      }
-      
-      if (stderr) {
-        reject(`stderr: ${stderr}`);
-      }
-      
-      resolve(`stdout:\n${stdout}`);
-    });
-  });
-  return exporter;
-}
 
 
 function findGMSSpriteFromAseprite(filePath, ctx, observer) {
