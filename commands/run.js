@@ -4,7 +4,9 @@ const chokidar = require('chokidar');
 const path = require('path');
 const { exec } = require('child_process');
 const fs = require('fs');
-var glob = require("glob")
+var glob = require("glob");
+
+const getGlobPromise = require('./utils/getGlobPromise');
 
 const SPRITES_DIR = "sprites/";
 const ART_DIR = "art/";
@@ -78,30 +80,6 @@ function run() {
     console.error(err);
   });
 }
-
-// UTILITIES
-/**
- * Wraps a `glob` call with a Promise.
- *
- * @param {string} globMatch - The glob to match
- * @param {string} errorText - The error that the Promise should return
- * @returns {Promise}
- */
-function getGlobPromise(globMatch, errorText) {
-  var checkProject = new Promise((resolve, reject) => {
-    glob(globMatch, function (error, files) {
-      if (error != null) {
-        reject(error);
-      } else if (files.length == 0) {
-        reject(new Error(errorText));
-      } else {
-        resolve(files);
-      }
-    });
-  })
-  return checkProject;
-}
-
 
 // PROJECT
 
