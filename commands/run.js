@@ -17,19 +17,30 @@ function run() {
   const tasks = new Listr([
     {
       title: "Check if git repo exists",
-      task: checkGitExists
+      task: function () {
+        return getGlobPromise(".git/", "No .git directory. Please setup a git repo first");
+      }
     },
     {
       title: "Check YYP file exists",
-      task: checkYYPFileExists
+      task: function () {
+        return getGlobPromise("*.yyp", "No .yyp file");;
+      }
     },
     {
       title: "Check sprites directory exists",
-      task: checkSpritesDirExists
+      task: function () {
+        return getGlobPromise(SPRITES_DIR, "No sprites directory");
+      }
     },
     {
       title: "Get sprites",
-      task: getSpriteDirectories
+      task: function (ctx) {
+        return getGlobPromise(SPRITES_DIR+"*/*.yy", "No sprites found")
+        .then(function (files) {
+          ctx.files = files;
+        });
+      }
     },
     {
       title: "Collect sprite data",
@@ -60,7 +71,7 @@ function run() {
       task: (ctx) => {
         return new Observable(observer => {
           observer.next('Watching…');
-
+          
           const watcher = chokidar.watch(`${ART_DIR}**/*.aseprite`);
           watcher.on('change', (path) => {
             observer.next('Updated: ' + path);
@@ -69,7 +80,7 @@ function run() {
               findGMSSpriteFromAseprite(path, ctx, observer);
             });
           })
-
+          
           // Never call this, let the user stop the program
           // observer.complete();
         });
@@ -81,58 +92,15 @@ function run() {
   });
 }
 
-// PROJECT
-
-/**
- * Checks if a `.git` exists where the script is being run
- *
- * @returns {Promise}
- */
-function checkGitExists() {
-  return getGlobPromise(".git/", "No .git directory. Please setup a git repo first");
-}
-
-/**
- * Checks if a YYP file exists where the script is being run
- *
- * @returns {Promise}
- */
-function checkYYPFileExists() {
-  return getGlobPromise("*.yyp", "No .yyp file");
-}
-
-/**
- * Checks if the sprites directory exists where the script is being run
- *
- * @returns {Promise}
- */
-function checkSpritesDirExists() {
-  return getGlobPromise(SPRITES_DIR, "No sprites directory");
-}
-
 // SPRITES
 
 /**
- * Goes through the sprites directory and puts all the `yy` files
- * in `files` inside of `ctx`.
- *
- * @param ctx - This is where the files are added
- * @returns {Promise}
- */
-function getSpriteDirectories(ctx) {
-    return getGlobPromise(SPRITES_DIR+"*/*.yy", "No sprites found")
-      .then(function (files) {
-        ctx.files = files;
-      });
-}
-
-/**
- * Collects sprites data for all the `files` in `ctx` and puts
- * it in `spriteDetails`.
- *
- * @param ctx
- * @returns {Listr}
- */
+* Collects sprites data for all the `files` in `ctx` and puts
+* it in `spriteDetails`.
+*
+* @param ctx
+* @returns {Listr}
+*/
 function collectSpriteData(ctx) {
   ctx.spriteDetails = {};
   var subTasks = ctx.files.map(file => {
@@ -147,13 +115,13 @@ function collectSpriteData(ctx) {
 }
 
 /**
- * Reads the sprite file, parses it, gets its details and puts them
- * in the `ctx`
- *
- * @param ctx
- * @param file - to be read
- * @returns {Promise}
- */
+* Reads the sprite file, parses it, gets its details and puts them
+* in the `ctx`
+*
+* @param ctx
+* @param file - to be read
+* @returns {Promise}
+*/
 function getSpriteReader(ctx, file) {
   var readSprite = new Promise((resolve, reject) => {
     fs.readFile(file, 'utf8', (err, json) => {
@@ -170,26 +138,26 @@ function getSpriteReader(ctx, file) {
 }
 
 /**
- * Parses the `yy` JSON format and returns it
- *
- * @params {string} json - JSON of the yy file
- * @returns {Object}
- */
+* Parses the `yy` JSON format and returns it
+*
+* @params {string} json - JSON of the yy file
+* @returns {Object}
+*/
 function parseSpriteJSON(json) {
   // Remove trailing commas
   let regex = /\,(?!\s*?[\{\[\"\'\w])/g;
   let correctData = json.replace(regex, '');
-
+  
   // parse JSON string to JSON object
   return JSON.parse(correctData);
 }
 
 /**
- * Gets the image and layer name details from a sprite.
- *
- * @params {Object} sprite - Parsed sprite data
- * @returns {Object} Object with `imgName(s)` and `layerName(s)`
- */
+* Gets the image and layer name details from a sprite.
+*
+* @params {Object} sprite - Parsed sprite data
+* @returns {Object} Object with `imgName(s)` and `layerName(s)`
+*/
 function getSpriteDetails(sprite) {
   if (sprite.frames.length === 1 ) {
     return {
@@ -200,7 +168,7 @@ function getSpriteDetails(sprite) {
     var imgNames = sprite.frames.map(frame => {
       return frame.compositeImage.FrameId.name;
     });
-
+    
     return {
       imgNames,
       layerName: sprite.layers[0].name
@@ -211,24 +179,24 @@ function getSpriteDetails(sprite) {
 // Getting Aseprite files
 
 /**
- * Looks into the `ART_DIR` and finds all Aseprite files
- *
- * @param ctx
- * @returns {Promise}
- */
+* Looks into the `ART_DIR` and finds all Aseprite files
+*
+* @param ctx
+* @returns {Promise}
+*/
 function getAsepriteFiles(ctx) {
   return getGlobPromise(ART_DIR+"**/*.aseprite", "No PNGs found")
-    .then(function (ases) {
-      ctx.ases = ases;
-    });
+  .then(function (ases) {
+    ctx.ases = ases;
+  });
 }
 
 /**
- * Creates tasks to export all Aseprite files that are in the
- * `ctx`.
- * @params ctx
- * @returns {Listr}
- */
+* Creates tasks to export all Aseprite files that are in the
+* `ctx`.
+* @params ctx
+* @returns {Listr}
+*/
 function exportAllAsepriteToPng(ctx) {
   var subTasks = ctx.ases.map(ase => {
     return {
@@ -242,13 +210,13 @@ function exportAllAsepriteToPng(ctx) {
 }
 
 /**
- * Exports PNGs from an Aseprite file. The output differs
- * based on whether the file is an animation or has exportable
- * layers.
- *
- * @param {string} filePath - Path to aseprite file
- * @returns {Promise}
- */
+* Exports PNGs from an Aseprite file. The output differs
+* based on whether the file is an animation or has exportable
+* layers.
+*
+* @param {string} filePath - Path to aseprite file
+* @returns {Promise}
+*/
 function exportFromAseprite(filePath) {
   var exporter = new Promise((resolve, reject) => {
     let name = path.basename(filePath,'.aseprite');
@@ -260,16 +228,16 @@ function exportFromAseprite(filePath) {
       '--save-as',
       dir+'/'+PREFIX+name+'{tag}-{frame001}.png'
     ].join( " " );
-
+    
     exec(command,(error, stdout, stderr) => {
       if (error) {
         reject(`error: ${error.message}`);
       }
-
+      
       if (stderr) {
         reject(`stderr: ${stderr}`);
       }
-
+      
       resolve(`stdout:\n${stdout}`);
     });
   });
@@ -300,7 +268,7 @@ function findGMSSpriteFromAseprite(filePath, ctx, observer) {
         spriteImgName,'/',
         spriteLayerImgName, '.png'
       ].join('');
-
+      
       var pngBuf = fs.readFileSync(pngPath)
       var gmsBuf = fs.readFileSync(spriteImgPath)
       if (pngBuf.equals(gmsBuf)) {
@@ -316,7 +284,7 @@ function findGMSSpriteFromAseprite(filePath, ctx, observer) {
         });
       }
     } else { // Animation
-
+      
     }
     //console.log(files);
     //observer.next(globMatch);
