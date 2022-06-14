@@ -1,18 +1,17 @@
 const Listr = require('listr');
 const {Observable} = require('rxjs');
 const chokidar = require('chokidar');
-const path = require('path');
-const fs = require('fs');
-var glob = require("glob");
 
 const getGlobPromise = require('./utils/getGlobPromise');
 const collectSpriteData = require("./collectSpriteData");
 const exportFromAseprite = require("./exportFromAseprite");
+const findGMSSpriteFromAseprite = require("./findGMSSpriteFromAseprite");
 
 const SPRITES_DIR = "sprites/";
 const ART_DIR = "art/";
 const ASEPRITE_PATH = "~/Library/Application\\ Support/Steam/steamapps/common/Aseprite/Aseprite.app/Contents/MacOS/aseprite";
 const PREFIX = "s";
+
 
 
 function run() {
@@ -95,56 +94,6 @@ function run() {
   
   tasks.run().catch(err => {
     console.error(err);
-  });
-}
-
-// Getting Aseprite files
-
-
-function findGMSSpriteFromAseprite(filePath, ctx, observer) {
-  let name = path.basename(filePath,'.aseprite');
-  let dir = path.dirname(filePath);
-  let globMatch = dir+'/'+PREFIX+name+'-*.png';
-  glob(globMatch, function (error, files) {
-    if (files.length === 1) { // Single sprite
-      let pngName = path.basename(files[0],'.png');
-      let pngPath = dir + `/` + pngName + '.png';
-      let spriteName = pngName.split('-')[0];
-      let spriteImgName = ctx.spriteDetails[spriteName].imgName
-      let spriteImgPath  = [
-        SPRITES_DIR,
-        spriteName,'/',
-        spriteImgName,'.png'
-      ].join('');
-      let spriteLayerImgName = ctx.spriteDetails[spriteName].layerName;
-      let spriteLayerImgPath = [
-        SPRITES_DIR,
-        spriteName,'/',
-        'layers/',
-        spriteImgName,'/',
-        spriteLayerImgName, '.png'
-      ].join('');
-      
-      var pngBuf = fs.readFileSync(pngPath)
-      var gmsBuf = fs.readFileSync(spriteImgPath)
-      if (pngBuf.equals(gmsBuf)) {
-        observer.next('No change in: ' + spriteName)
-      } else {
-        fs.copyFile(pngPath, spriteImgPath, function (error) {
-          if (error) throw new Error(error);
-          observer.next('Updated in GMS: ' + spriteName);
-        });
-        fs.copyFile(pngPath, spriteLayerImgPath, function (error) {
-          if (error) throw new Error(error);
-          observer.next('Updated in GMS: ' + spriteName);
-        });
-      }
-    } else { // Animation
-      
-    }
-    //console.log(files);
-    //observer.next(globMatch);
-    //observer.next(files[0]);
   });
 }
 
