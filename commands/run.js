@@ -7,7 +7,7 @@ const fs = require('fs');
 var glob = require("glob");
 
 const getGlobPromise = require('./utils/getGlobPromise');
-const { collectSpriteData } = require("./collectSpriteData");
+const collectSpriteData = require("./collectSpriteData");
 
 const SPRITES_DIR = "sprites/";
 const ART_DIR = "art/";

@@ -21,7 +21,6 @@ function collectSpriteData(ctx) {
   });
   return new Listr(subTasks);
 }
-exports.collectSpriteData = collectSpriteData;
 
 /**
 * Reads the sprite file, parses it, gets its details and puts them
@@ -84,3 +83,5 @@ function getSpriteDetails(sprite) {
     };
   }
 }
+
+module.exports = collectSpriteData;
