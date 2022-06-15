@@ -2,27 +2,30 @@ const path = require('path');
 const fs = require('fs');
 const glob = require('glob');
 
-// Getting Aseprite files
+/**
+ * Take the Aseprite filename and find all PNGs that start with 
+ * that name. This will include somethings that might not have been 
+ * affected (for eg UIBubble and UIBubblePointer). For each of the 
+ * PNGs we'll get all the frames. Even if it is a single frame it'll
+ * still be `-001.png`. Then based on this list of PNGs find all 
+ * possible GMS sprites. See if these sprites actually exist and 
+ * then update those.
+ * 
+ * @param {String} filePath - path to Aseprite file
+ * @param {Object} ctx 
+ * @param {Object} observer 
+ */
 function findGMSSpriteFromAseprite(filePath, ctx, observer) {
   let dir = path.dirname(filePath);
   let globMatch = getPNGGlobFromAseprite(filePath, ctx);
   glob(globMatch, function (error, files) {
     if (error) observer.next(error);
 
-    // TODO Explain the roundabout ping pong method of doing things
-    // and why we are doing them this way
-
-    // How to find things from Aseprite vs Sprite
-
     let affectedSprites = getAffectedSprites(files);
-
-    // TODO Check if these sprites exist in GMS 
     affectedSprites = affectedSprites.filter(spriteName => {
+      // TODO Should we warn if sprites don't exist?
       return ctx.spriteDetails[spriteName] !== undefined;
     });
-
-    // TODO warn if sprites don't exist?
-    observer.next(affectedSprites);
 
     affectedSprites.forEach((spriteName) => {
       getPNGsForSprite(spriteName, dir).then((pngs)=> {
