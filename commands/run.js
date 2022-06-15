@@ -81,7 +81,7 @@ function run(options) {
           const watcher = chokidar.watch(`${ctx.ART_DIR}**/*.aseprite`);
           watcher.on('change', (path) => {
             observer.next('Updated: ' + path);
-            exportFromAseprite(path).then(function () {
+            exportFromAseprite(ctx, path).then(function () {
               observer.next('Exported: ' + path);
               findGMSSpriteFromAseprite(path, ctx, observer);
             });
