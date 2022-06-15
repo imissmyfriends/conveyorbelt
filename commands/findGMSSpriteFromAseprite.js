@@ -8,14 +8,21 @@ function findGMSSpriteFromAseprite(filePath, ctx, observer) {
   let globMatch = getPNGGlobFromAseprite(filePath, ctx);
   glob(globMatch, function (error, files) {
     if (error) observer.next(error);
+
+    // TODO Explain the roundabout ping pong method of doing things
+    // and why we are doing them this way
+
     let affectedSprites = getAffectedSprites(files);
 
-    // Check if these sprites exist in GMS 
+    // TODO Check if these sprites exist in GMS 
     observer.next(affectedSprites);
 
     affectedSprites.forEach((spriteName) => {
       getPNGsForSprite(spriteName, dir).then((pngs)=> {
         observer.next(pngs);
+        if (pngs.length == 1) {
+          importSingleGMSSprite(pngs, ctx, observer);
+        }
       });
     });
 
@@ -24,10 +31,11 @@ function findGMSSpriteFromAseprite(filePath, ctx, observer) {
     //observer.next(files[0]);
   });
 }
+module.exports = findGMSSpriteFromAseprite;
 
 function getPNGsForSprite(spriteName, dir) {
   var promise = new Promise((resolve, reject) => {
-    glob(`${dir}/${spriteName}*.png`, (error, pngs) => {
+    glob(`${dir}/${spriteName}-*.png`, (error, pngs) => {
       if (error) reject(error);
       resolve(pngs);
     })
@@ -59,10 +67,8 @@ function onlyUnique(value, index, self) {
   return self.indexOf(value) === index;
 }
 
-module.exports = findGMSSpriteFromAseprite;
-
-
 function importSingleGMSSprite(files, ctx, observer) {
+  let dir = path.dirname(files[0]);
   let pngName = path.basename(files[0], '.png');
   let pngPath = dir + `/` + pngName + '.png';
   let spriteName = pngName.split('-')[0];
@@ -83,8 +89,9 @@ function importSingleGMSSprite(files, ctx, observer) {
 
   var pngBuf = fs.readFileSync(pngPath);
   var gmsBuf = fs.readFileSync(spriteImgPath);
+
   if (pngBuf.equals(gmsBuf)) {
-    observer.next('No change in: ' + spriteName);
+    // observer.next('No change in: ' + spriteName);
   } else {
     fs.copyFile(pngPath, spriteImgPath, function (error) {
       if (error)
