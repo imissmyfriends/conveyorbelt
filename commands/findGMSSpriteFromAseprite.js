@@ -12,6 +12,8 @@ function findGMSSpriteFromAseprite(filePath, ctx, observer) {
     // TODO Explain the roundabout ping pong method of doing things
     // and why we are doing them this way
 
+    // How to find things from Aseprite vs Sprite
+
     let affectedSprites = getAffectedSprites(files);
 
     // TODO Check if these sprites exist in GMS 
@@ -22,6 +24,8 @@ function findGMSSpriteFromAseprite(filePath, ctx, observer) {
         observer.next(pngs);
         if (pngs.length == 1) {
           importSingleGMSSprite(pngs, ctx, observer);
+        } else {
+          observer.next(pngs);
         }
       });
     });
@@ -68,40 +72,59 @@ function onlyUnique(value, index, self) {
 }
 
 function importSingleGMSSprite(files, ctx, observer) {
+  // Get sprite name
   let dir = path.dirname(files[0]);
   let pngName = path.basename(files[0], '.png');
   let pngPath = dir + `/` + pngName + '.png';
   let spriteName = pngName.split('-')[0];
-  let spriteImgName = ctx.spriteDetails[spriteName].imgName;
-  let spriteImgPath = [
+
+  let spritePaths = getSpritePaths(ctx, spriteName);
+
+  compareAndCopy(
+    pngPath,
+    spritePaths.img,
+    spritePaths.layer,
+    spriteName,
+    observer
+  );
+}
+
+function getSpritePaths(ctx, spriteName) {
+  let imgName = ctx.spriteDetails[spriteName].imgName;
+  let imgPath = [
     ctx.SPRITES_DIR,
     spriteName, '/',
-    spriteImgName, '.png'
+    imgName, '.png'
   ].join('');
-  let spriteLayerImgName = ctx.spriteDetails[spriteName].layerName;
-  let spriteLayerImgPath = [
+  let layerImgName = ctx.spriteDetails[spriteName].layerName;
+  let layerImgPath = [
     ctx.SPRITES_DIR,
     spriteName, '/',
     'layers/',
-    spriteImgName, '/',
-    spriteLayerImgName, '.png'
+    imgName, '/',
+    layerImgName, '.png'
   ].join('');
+  return {
+    img: imgPath,
+    layer: layerImgPath
+  }
+}
 
+function compareAndCopy(pngPath, spriteImgPath, spriteLayerImgPath, spriteName, observer) {
   var pngBuf = fs.readFileSync(pngPath);
   var gmsBuf = fs.readFileSync(spriteImgPath);
 
   if (pngBuf.equals(gmsBuf)) {
     // observer.next('No change in: ' + spriteName);
   } else {
-    fs.copyFile(pngPath, spriteImgPath, function (error) {
-      if (error)
-        throw new Error(error);
-      observer.next('Updated in GMS: ' + spriteName);
-    });
-    fs.copyFile(pngPath, spriteLayerImgPath, function (error) {
-      if (error)
-        throw new Error(error);
-      observer.next('Updated in GMS: ' + spriteName);
-    });
+    copyFiles(pngPath, spriteImgPath, spriteName, observer);
+    copyFiles(pngPath, spriteLayerImgPath, spriteName, observer);
   }
+}
+
+function copyFiles(from, to, spriteName, observer) {
+  fs.copyFile(from, to, (error) => {
+    if (error) throw new Error(error);
+    observer.next('Updated in GMS: ' + spriteName);
+  });
 }
