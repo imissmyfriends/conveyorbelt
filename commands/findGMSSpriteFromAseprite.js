@@ -17,6 +17,11 @@ function findGMSSpriteFromAseprite(filePath, ctx, observer) {
     let affectedSprites = getAffectedSprites(files);
 
     // TODO Check if these sprites exist in GMS 
+    affectedSprites = affectedSprites.filter(spriteName => {
+      return ctx.spriteDetails[spriteName] !== undefined;
+    });
+
+    // TODO warn if sprites don't exist?
     observer.next(affectedSprites);
 
     affectedSprites.forEach((spriteName) => {
@@ -25,7 +30,8 @@ function findGMSSpriteFromAseprite(filePath, ctx, observer) {
         if (pngs.length == 1) {
           importSingleGMSSprite(pngs, ctx, observer);
         } else {
-          observer.next(pngs);
+          importAnimationGMSSprite(pngs, ctx, observer);
+//          observer.next(pngs);
         }
       });
     });
@@ -72,16 +78,12 @@ function onlyUnique(value, index, self) {
 }
 
 function importSingleGMSSprite(files, ctx, observer) {
-  // Get sprite name
-  let dir = path.dirname(files[0]);
   let pngName = path.basename(files[0], '.png');
-  let pngPath = dir + `/` + pngName + '.png';
   let spriteName = pngName.split('-')[0];
 
   let spritePaths = getSpritePaths(ctx, spriteName);
-
   compareAndCopy(
-    pngPath,
+    files[0],
     spritePaths.img,
     spritePaths.layer,
     spriteName,
@@ -89,14 +91,37 @@ function importSingleGMSSprite(files, ctx, observer) {
   );
 }
 
-function getSpritePaths(ctx, spriteName) {
-  let imgName = ctx.spriteDetails[spriteName].imgName;
+function importAnimationGMSSprite(files, ctx, observer) {
+  let pngName = path.basename(files[0], '.png');
+  let spriteName = pngName.split('-')[0];
+
+  files.forEach((f, i) => {
+    let spritePaths = getSpritePaths(ctx, spriteName, i);
+    compareAndCopy(
+      f,
+      spritePaths.img,
+      spritePaths.layer,
+      spriteName,
+      observer
+    );
+  })
+}
+
+function getSpritePaths(ctx, spriteName, index) {
+  var imgName, layerImgName;
+  if (index == undefined) {
+    imgName = ctx.spriteDetails[spriteName].imgName;
+    layerImgName = ctx.spriteDetails[spriteName].layerName;
+  } else {
+    imgName = ctx.spriteDetails[spriteName].imgNames[index];
+    layerImgName = ctx.spriteDetails[spriteName].layerName;
+  }
+
   let imgPath = [
     ctx.SPRITES_DIR,
     spriteName, '/',
     imgName, '.png'
   ].join('');
-  let layerImgName = ctx.spriteDetails[spriteName].layerName;
   let layerImgPath = [
     ctx.SPRITES_DIR,
     spriteName, '/',
