@@ -2,7 +2,7 @@ const Listr = require('listr');
 const {Observable} = require('rxjs');
 const chokidar = require('chokidar');
 
-const getGlobPromise = require('./utils/getGlobPromise');
+const getGlobPromise = require('./getGlobPromise');
 const collectSpriteData = require("./collectSpriteData");
 const exportFromAseprite = require("./exportFromAseprite");
 const findGMSSpriteFromAseprite = require("./findGMSSpriteFromAseprite");
