@@ -1,5 +1,22 @@
 # conveyorbelt
 
+> This tool is being developed for 🐟 Fishbowl, you can follow along on [Twitter](https://twitter.com/imissmy_friends).
+
+> **⚠️ Warning**: The tool fails if the exported file is a different size or if the number of frames in the animation changes.
+
+## CLI Help
+```
+% conveyorbelt run --help
+Usage: conveyorbelt run [options]
+
+Options:
+  -sd, --sprites-dir <string>    Directory of GMS sprites (default: "sprites/")
+  -ad, --art-dir <string>        Directory of Aseprite art (default: "art/")
+  -ap, --aseprite-path <string>  Path to Aseprite executable (default: "~/Library/Application\\ Support/Steam/steamapps/common/Aseprite/Aseprite.app/Contents/MacOS/aseprite")
+  -p, --prefix <string>          String prefix for GMS sprites (default: "s")
+  -h, --help                     display help for command
+  ```
+
 ## Configuration
 - `SPRITES_DIR` defaults to `sprites/`: GameMaker sprites
 - `ART_DIR` defaults to `art/`: Aseprite sprites
@@ -12,20 +29,13 @@
   - ~/Library/ApplicationSupport/Steam/steamapps/common/Aseprite/Aseprite.app/Contents/MacOS/aseprite (Steam)
 
 ## Convention
-- Aseprite file names need to match the sprite names in GameMaker (except the `PREFIX`, see configuration `TODO LINK`)
-
-### Export convention
+- Aseprite file names need to match the sprite names in GameMaker (except the `PREFIX`, see Configuration above)
 - If the sprite doesn't have any particular export layers or animations then a single PNG should be exported. For eg `UIBubble.aseprite` should make `sUIBubble.png`
-- Files can have only particular layers exported by prefixing the layer name with an `x`. For eg `LightMonsoon.aseprite` with the layers `xBedroomMorning` and `xBedroomNight` will result in the following PNG - `sLightMonsoonBedroomMorning` and `sLightMonsoonBedroomNight`.
+- Files can have only particular layers exported by prefixing the layer name with `-x` or `-xt` (if you want the PNG to be trimmed). For eg `LightMonsoon.aseprite` with the layers `-xBedroomMorning` and `-xtBedroomNight` will result in the following PNG - `sLightMonsoonBedroomMorning` and `sLightMonsoonBedroomNight`.
 - Animations will have the frame number appended to the file name after a `-`. So `RainParticle.aseprite` would create `sRainParticle-001.png`, `sRainParticle-002.png` and so on.
-- Files that have multiple animation tags
+- Files that have multiple animation tags will have the tag added at the end.
 
-
-Might need to change how we find PNGs to put into GMS. When exporting from Aseprite we need a way to figure out which sprites need to be updated. Interpreting that from just the PNG filenames is going to make it tricky for no reason. Also its nicer to have clean PNG filenames maybe? No one needs to see them so I am not sure that is valid. I think the only consideration should be
-- How to export from Aseprite
-- How to make it easy to import to GMS
-
-### Kinds of Aseprite files
+### Example Aseprite files and how they'll be exported
 - Single sprite `UIBubble.aseprite` -> `UIBubble.png` -> `sUIBubble`
 - Single animation `AirConFan.aseprite` -> `AirConFan001.png`, `AirConFan002.png`... -> `sAirConFan`
 - Multiple animations (tags) `Alo.aseprite` with tags (`WalkFront`, `WalkBack`)
@@ -34,13 +44,13 @@ Might need to change how we find PNGs to put into GMS. When exporting from Asepr
 - Multiple layers (some prefix to mark only those for export): `LightBedroom.aseprite` with layers `xWindowMorning` and `xLampNight`:
   - `LightBedroomWindowMorning.png` -> `sLightBedroomWindowMorning`
   - `LightBedroomLampNight.png` -> `sLightBedroomLampNight`
-- Multiple layers + one animation for each `Window.aseprite` with layers `xOutside` and `xCurtains`:
+- Multiple layers + one animation for each `Window.aseprite` with layers `-xtOutside` and `-xCurtains`:
   - `WindowOutside001.png`, `WindowOutside002.png`... -> `sWindowOutside`
   - `WindowCurtains001.png`, `WindowCurtains002.png`... -> `sWindowCurtains`
-- Multiple layers + multiple tagged animation for each: `MomVideoCall.aseprite` with layers `xBackground` and `xPortrait`.
-  - `xBackground` has animation with tags `Night` and `Day`
+- Multiple layers + multiple tagged animation for each: `MomVideoCall.aseprite` with layers `-xBackground` and `-xPortrait`.
+  - `-xBackground` has animation with tags `Night` and `Day`
     - `MomVideoCallBackgroundNight001.png`, `MomVideoCallBackgroundNight002.png`... -> `sMomVideoCallBackgroundNight`
     - `MomVideoCallBackgroundDay001.png`, `MomVideoCallBackgroundDay002.png`... -> `sMomVideoCallBackgroundDay`
-  - `xPortrait` has animation with tags `Happy` and `Sad`:
+  - `-xPortrait` has animation with tags `Happy` and `Sad`:
     - `MomVideoCallPortraitHappy001.png`, `MomVideoCallPortraitHappy002.png`... -> `sMomVideoCallPortraitHappy`
     - `MomVideoCallPortraitSad001.png`, `MomVideoCallPortraitSad002.png`... -> `sMomVideoCallPortraitSad`
