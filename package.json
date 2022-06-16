@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --watch",
-    "doc": "jsdoc2md **/*.js >> DOC.md"
+    "doc": "jsdoc2md **/*.js > API.md"
   },
   "bin": {
     "conveyorbelt": "./index.js"
