@@ -4,6 +4,9 @@
 
 > **⚠️ Warning**: The tool fails if the exported file is a different size or if the number of frames in the animation changes.
 
+![conveyorbelt](https://user-images.githubusercontent.com/9491/174024453-55c428ad-69f7-48c0-b0c3-7943f82de76b.gif)
+
+
 ## CLI Help
 ```
 % conveyorbelt run --help
