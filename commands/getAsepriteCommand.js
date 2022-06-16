@@ -2,6 +2,13 @@ const Listr = require('listr');
 const path = require('path');
 const { exec } = require('child_process');
 
+/**
+ * Iterates through all the Aseprite files in the context and
+ * creates subtasks to get their export commands.
+ * 
+ * @param {Object} ctx 
+ * @returns {Listr}
+ */
 function getAllAsepriteCommands (ctx) {
     ctx.asepriteCommands = {};
     var subTasks = ctx.ases.map(file => {
@@ -14,7 +21,17 @@ function getAllAsepriteCommands (ctx) {
     });
     return new Listr(subTasks);
 }
+module.exports = getAllAsepriteCommands;
 
+/**
+ * Uses the Aseprite lis layers command to see if the file has 
+ * layers that need exporting and then returns the correct command
+ * accordingly.
+ * 
+ * @param {Object} ctx 
+ * @param {String} filePath 
+ * @returns {Promise}
+ */
 function getAsepriteCommand (ctx, filePath) {
     var getCommand = new Promise((resolve, reject) => {
         let layerCommand = [
@@ -43,6 +60,15 @@ function getAsepriteCommand (ctx, filePath) {
     return getCommand;
 }
 
+/**
+ * Creates an Aseprite CLI export command based on whether the file
+ * has layers that need to be exported or trimmed.
+ * 
+ * @param {Object} ctx 
+ * @param {String} filePath 
+ * @param {String} [layer]
+ * @returns 
+ */
 function createAsepriteCommand(ctx, filePath, layer) {
     let name = path.basename(filePath, '.aseprite');
     let dir = path.dirname(filePath);
@@ -79,5 +105,3 @@ function createAsepriteCommand(ctx, filePath, layer) {
         ].join(' ');
     }
 }
-
-module.exports = getAllAsepriteCommands;
