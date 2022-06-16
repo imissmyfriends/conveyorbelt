@@ -6,6 +6,7 @@ const getGlobPromise = require('./utils/getGlobPromise');
 const collectSpriteData = require("./collectSpriteData");
 const exportFromAseprite = require("./exportFromAseprite");
 const findGMSSpriteFromAseprite = require("./findGMSSpriteFromAseprite");
+const getAllAsepriteCommands = require('./getAsepriteCommand');
 
 function run(options) {
   const tasks = new Listr([
@@ -59,12 +60,16 @@ function run(options) {
       }
     },
     {
+      title: "Get Aseprite commands",
+      task: getAllAsepriteCommands
+    },
+    {
       title: "Export Aseprite files to PNG",
       task: function (ctx) {
         var subTasks = ctx.ases.map(ase => {
           return {
             title: `Exporting ${ase}...`,
-            task: function (ctx, task) {
+            task: function (ctx) {
               return exportFromAseprite(ctx, ase);
             }
           };

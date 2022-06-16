@@ -1,4 +1,3 @@
-const path = require('path');
 const { exec } = require('child_process');
 
 /**
@@ -10,16 +9,8 @@ const { exec } = require('child_process');
 * @returns {Promise}
 */
 function exportFromAseprite(ctx, filePath) {
-  var exporter = new Promise((resolve, reject) => {
-    let name = path.basename(filePath, '.aseprite');
-    let dir = path.dirname(filePath);
-    let command = [
-      ctx.ASEPRITE_PATH,
-      '-b',
-      filePath,
-      '--save-as',
-      dir + '/' + ctx.PREFIX + name + '{tag}-{frame001}.png'
-    ].join(" ");
+  return new Promise(function(resolve, reject){
+    let command = ctx.asepriteCommands[filePath];
 
     exec(command, (error, stdout, stderr) => {
       if (error) {
@@ -33,6 +24,5 @@ function exportFromAseprite(ctx, filePath) {
       resolve(`stdout:\n${stdout}`);
     });
   });
-  return exporter;
 }
 module.exports = exportFromAseprite;
