@@ -1,6 +1,7 @@
 const Listr = require('listr');
 const {Observable} = require('rxjs');
 const chokidar = require('chokidar');
+const VerboseRenderer = require('listr-verbose-renderer');
 
 const getGlobPromise = require('./getGlobPromise');
 const collectSpriteData = require("./collectSpriteData");
@@ -97,7 +98,9 @@ function run(options) {
         });
       }
     }
-  ]);
+  ], {
+    renderer: VerboseRenderer
+  });
   
   tasks.run().catch(err => {
     console.error(err);
