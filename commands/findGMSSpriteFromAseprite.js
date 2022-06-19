@@ -223,6 +223,10 @@ function copyFiles(from, to, spriteName, observer) {
   });
 }
 
+/**
+ * Checks if the PNG provided is a different size from the sprite.
+ * Checks against the sprite data that was first collected initially.
+ */
 function hasSizeChanged(pngFile, sprite) {
   const pngSize = sizeOf(pngFile);
   const spriteSize = sprite.size;
@@ -235,6 +239,10 @@ function hasSizeChanged(pngFile, sprite) {
   return true;
 }
 
+/**
+ * Updates the dimensions of the sprite in the YY file along with its
+ * bounding box values.
+ */
 function updateDimensionsInYY(pngFile, sprite, ctx) {
   const pngSize = sizeOf(pngFile);
 
@@ -258,6 +266,10 @@ function updateDimensionsInYY(pngFile, sprite, ctx) {
   }
 }
 
+/**
+ * Given a YY file, an old and new value, updates that key. Doesn't do any JSON
+ * Just replaces a string.
+ */
 function changeValueInYY(file, valueName, oldValue, newValue) {
   const from = new RegExp(`"${valueName}": ${oldValue},`, 'g')
   const to = `"${valueName}": ${newValue},`;
