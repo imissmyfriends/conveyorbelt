@@ -72,7 +72,8 @@ function getSpriteDetails(sprite) {
     return {
       imgName: sprite.frames[0].compositeImage.FrameId.name,
       layerName: sprite.layers[0].name,
-      size: getSpriteSize(sprite)
+      size: getSpriteSize(sprite),
+      defaultBbox: hasDefaultBoundingBox(sprite)
     };
   } else {
     var imgNames = sprite.frames.map(frame => {
@@ -82,10 +83,30 @@ function getSpriteDetails(sprite) {
     return {
       imgNames,
       layerName: sprite.layers[0].name,
-      size: getSpriteSize(sprite)
+      size: getSpriteSize(sprite),
+      defaultBbox: hasDefaultBoundingBox(sprite)
     };
   }
 }
+
+/**
+ * Checks if the sprite has a default bounding box
+ * 
+ * @param {Object} sprite 
+ * @returns {Boolean}
+ */
+function hasDefaultBoundingBox(sprite){
+  if (
+    sprite.bbox_left === 0 &&
+    sprite.bbox_top === 0 &&
+    sprite.bbox_right === sprite.width - 1 &&
+    sprite.bbox_bottom === sprite.height - 1
+  ) {
+    return true;
+  }
+    return false;
+}
+
 
 /**
  * Size and bounding box data from the sprite
