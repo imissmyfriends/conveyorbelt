@@ -38,6 +38,7 @@ function getSpriteReader(ctx, file) {
       } else {
         var sprite = parseSpriteJSON(json);
         ctx.spriteDetails[sprite.name] = getSpriteDetails(sprite);
+        ctx.spriteDetails[sprite.name]["file"] = file;
         resolve(ctx);
       }
     });
