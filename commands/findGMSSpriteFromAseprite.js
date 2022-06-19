@@ -127,7 +127,7 @@ function importSingleGMSSprite(files, ctx, observer) {
   );
 
   if (hasSizeChanged(pngFile, spriteDetails)) {
-    updateDimensionsInYY(pngFile, spriteDetails);
+    updateDimensionsInYY(pngFile, spriteDetails, ctx);
   }
 }
 
@@ -141,6 +141,7 @@ function importSingleGMSSprite(files, ctx, observer) {
 function importAnimationGMSSprite(files, ctx, observer) {
   let pngName = path.basename(files[0], '.png');
   let spriteName = pngName.split('-')[0];
+  var spriteDetails = ctx.spriteDetails[spriteName];
 
   files.forEach((f, i) => {
     let spritePaths = getSpritePaths(ctx, spriteName, i);
@@ -151,7 +152,11 @@ function importAnimationGMSSprite(files, ctx, observer) {
       spriteName,
       observer
     );
-  })
+  });
+
+   if (hasSizeChanged(files[0], spriteDetails)) {
+    updateDimensionsInYY(files[0], spriteDetails, ctx);
+  }   
 }
 
 /**
@@ -230,28 +235,36 @@ function hasSizeChanged(pngFile, sprite) {
   return true;
 }
 
-function updateDimensionsInYY(pngFile, sprite) {
+function updateDimensionsInYY(pngFile, sprite, ctx) {
   const pngSize = sizeOf(pngFile);
 
   // Fix YY file
-  const widthRegExp = new RegExp(`/"width": ${sprite.size.width},/`, 'g');
-  const heightRegExp = new RegExp(`"height": ${sprite.size.height},`, 'g');
-  var rh = replace.sync({
-    files: sprite.file,
-    from: heightRegExp,
-    to: `"height": ${pngSize.height},`
-  });
-  var rw = replace.sync({
-    files: sprite.file,
-    from: widthRegExp,
-    to: `"width": ${pngSize.width},`
-  });
+  changeValueInYY(sprite.file, 'width', sprite.size.width, pngSize.width);
+  changeValueInYY(sprite.file, 'height', sprite.size.height, pngSize.height);
 
   // Update the context
   ctx.spriteDetails[sprite.name].size.width = pngSize.width;
   ctx.spriteDetails[sprite.name].size.height = pngSize.height;
 
   // Check if has default BBOX
-  // Warn
-  // Update bbox
+  if (sprite.defaultBbox) {
+      changeValueInYY(sprite.file, 'bbox_right', sprite.size.bbox.right, pngSize.width - 1 );
+      changeValueInYY(sprite.file, 'bbox_bottom', sprite.size.bbox.bottom, pngSize.height - 1 );
+
+      ctx.spriteDetails[sprite.name].size.bbox.right = pngSize.width - 1;
+      ctx.spriteDetails[sprite.name].size.bbox.bottom = pngSize.height - 1;
+  } else {
+    console.log(`WARNING: Size of ${sprite.name} was updated but the bbox was not `)
+  }
+}
+
+function changeValueInYY(file, valueName, oldValue, newValue) {
+  const from = new RegExp(`"${valueName}": ${oldValue},`, 'g')
+  const to = `"${valueName}": ${newValue},`;
+
+  return replace.sync({
+    files: file,
+    from: from,
+    to: to
+  });
 }
