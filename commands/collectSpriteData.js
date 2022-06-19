@@ -39,6 +39,7 @@ function getSpriteReader(ctx, file) {
         var sprite = parseSpriteJSON(json);
         ctx.spriteDetails[sprite.name] = getSpriteDetails(sprite);
         ctx.spriteDetails[sprite.name]["file"] = file;
+        ctx.spriteDetails[sprite.name]["name"] = sprite.name;
         resolve(ctx);
       }
     });

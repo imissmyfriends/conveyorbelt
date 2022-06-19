@@ -1,8 +1,8 @@
 const path = require('path');
 const fs = require('fs');
 const glob = require('glob');
-const sizeOf = require('image-size')
-
+const sizeOf = require('image-size');
+const replace = require('replace-in-file');
 
 /**
  * Take the Aseprite filename and find all PNGs that start with 
@@ -112,17 +112,23 @@ function onlyUnique(value, index, self) {
  * @param {Object} observer 
  */
 function importSingleGMSSprite(files, ctx, observer) {
-  let pngName = path.basename(files[0], '.png');
+  var pngFile = files[0];
+  let pngName = path.basename(pngFile, '.png');
   let spriteName = pngName.split('-')[0];
+  var spriteDetails = ctx.spriteDetails[spriteName];
 
   let spritePaths = getSpritePaths(ctx, spriteName);
   compareAndCopy(
-    files[0],
+    pngFile,
     spritePaths.img,
     spritePaths.layer,
     spriteName,
     observer
   );
+
+  if (hasSizeChanged(pngFile, spriteDetails)) {
+    updateDimensionsInYY(pngFile, spriteDetails);
+  }
 }
 
 /**
@@ -210,4 +216,42 @@ function copyFiles(from, to, spriteName, observer) {
     if (error) throw new Error(error);
     observer.next('Updated in GMS: ' + spriteName);
   });
+}
+
+function hasSizeChanged(pngFile, sprite) {
+  const pngSize = sizeOf(pngFile);
+  const spriteSize = sprite.size;
+  if(
+    pngSize.height === spriteSize.height &&
+    pngSize.width === spriteSize.width
+  ) {
+    return false;
+  }
+  return true;
+}
+
+function updateDimensionsInYY(pngFile, sprite) {
+  const pngSize = sizeOf(pngFile);
+
+  // Fix YY file
+  const widthRegExp = new RegExp(`/"width": ${sprite.size.width},/`, 'g');
+  const heightRegExp = new RegExp(`"height": ${sprite.size.height},`, 'g');
+  var rh = replace.sync({
+    files: sprite.file,
+    from: heightRegExp,
+    to: `"height": ${pngSize.height},`
+  });
+  var rw = replace.sync({
+    files: sprite.file,
+    from: widthRegExp,
+    to: `"width": ${pngSize.width},`
+  });
+
+  // Update the context
+  ctx.spriteDetails[sprite.name].size.width = pngSize.width;
+  ctx.spriteDetails[sprite.name].size.height = pngSize.height;
+
+  // Check if has default BBOX
+  // Warn
+  // Update bbox
 }

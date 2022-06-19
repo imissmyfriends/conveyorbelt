@@ -28,6 +28,7 @@
     "listr": "^0.14.3",
     "listr-verbose-renderer": "^0.6.0",
     "path": "^0.12.7",
+    "replace-in-file": "^6.3.5",
     "rxjs": "^7.5.5"
   },
   "devDependencies": {
