@@ -71,7 +71,8 @@ function getSpriteDetails(sprite) {
   if (sprite.frames.length === 1) {
     return {
       imgName: sprite.frames[0].compositeImage.FrameId.name,
-      layerName: sprite.layers[0].name
+      layerName: sprite.layers[0].name,
+      size: getSpriteSize(sprite)
     };
   } else {
     var imgNames = sprite.frames.map(frame => {
@@ -80,9 +81,29 @@ function getSpriteDetails(sprite) {
 
     return {
       imgNames,
-      layerName: sprite.layers[0].name
+      layerName: sprite.layers[0].name,
+      size: getSpriteSize(sprite)
     };
   }
+}
+
+/**
+ * Size and bounding box data from the sprite
+ * 
+ * @param {Object} sprite 
+ * @returns {Object}
+ */
+function getSpriteSize(sprite) {
+  var size = {};
+  size.width = sprite.width;
+  size.height = sprite.height;
+  size.bbox = {
+    left: sprite.bbox_left,
+    right: sprite.bbox_right,
+    top: sprite.bbox_top,
+    bottom: sprite.bbox_bottom,
+  }
+  return size;
 }
 
 module.exports = collectSpriteData;
