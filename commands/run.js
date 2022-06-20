@@ -25,6 +25,7 @@ function run(options) {
         ctx.ART_DIR = options.artDir;
         ctx.ASEPRITE_PATH = options.asepritePath;
         ctx.PREFIX = options.prefix;
+        ctx.EXPORT = options.export;
       }
     },
     {
@@ -73,6 +74,9 @@ function run(options) {
     },
     {
       title: "Export Aseprite files to PNG",
+      skip: function (ctx) {
+        return !ctx.EXPORT;
+      },
       task: function (ctx) {
         var subTasks = ctx.ases.map(ase => {
           return {

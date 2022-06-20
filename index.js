@@ -14,6 +14,7 @@ program
   .option('-ap, --aseprite-path <string>', 'Path to Aseprite executable', ASEPRITE_PATH)
   .option('-p, --prefix <string>', 'String prefix for GMS sprites', PREFIX)
   .option('-v, --verbose', 'Whether or not to use the verbose renderer', false)
+  .option('-ne, --no-export', 'Whether or not to export all Aseprite files on first run')
   .action(run);
 
 program.parse();
