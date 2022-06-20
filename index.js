@@ -13,6 +13,7 @@ program
   .option('-ad, --art-dir <string>', 'Directory of Aseprite art', ART_DIR)
   .option('-ap, --aseprite-path <string>', 'Path to Aseprite executable', ASEPRITE_PATH)
   .option('-p, --prefix <string>', 'String prefix for GMS sprites', PREFIX)
+  .option('-v, --verbose', 'Whether or not to use the verbose renderer', false)
   .action(run);
 
 program.parse();

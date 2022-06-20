@@ -10,6 +10,13 @@ const findGMSSpriteFromAseprite = require("./findGMSSpriteFromAseprite");
 const getAllAsepriteCommands = require('./getAsepriteCommand');
 
 function run(options) {
+  var listrOptions = {};
+  if (options.verbose) {
+    listrOptions = {
+      renderer: VerboseRenderer
+    };
+  }
+
   const tasks = new Listr([
     {
       title: "Initializing context",
@@ -98,9 +105,7 @@ function run(options) {
         });
       }
     }
-  ], {
-    renderer: VerboseRenderer
-  });
+  ], listrOptions);
   
   tasks.run().catch(err => {
     console.error(err);
