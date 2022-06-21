@@ -17,6 +17,8 @@ Options:
   -ad, --art-dir <string>        Directory of Aseprite art (default: "art/")
   -ap, --aseprite-path <string>  Path to Aseprite executable (default: "~/Library/Application\\ Support/Steam/steamapps/common/Aseprite/Aseprite.app/Contents/MacOS/aseprite")
   -p, --prefix <string>          String prefix for GMS sprites (default: "s")
+  -v, --verbose                  Whether or not to use the verbose renderer (default: false)
+  -ne, --no-export               Whether or not to export all Aseprite files on first run
   -h, --help                     display help for command
   ```
 
