@@ -25,6 +25,7 @@
     "commander": "^9.3.0",
     "glob": "^8.0.3",
     "image-size": "^1.0.1",
+    "kleur": "^4.1.4",
     "listr": "^0.14.3",
     "listr-verbose-renderer": "^0.6.0",
     "path": "^0.12.7",

@@ -3,6 +3,7 @@ const fs = require('fs');
 const glob = require('glob');
 const sizeOf = require('image-size');
 const replace = require('replace-in-file');
+const { red, yellow } = require('kleur');
 
 /**
  * Take the Aseprite filename and find all PNGs that start with 
@@ -25,8 +26,9 @@ function findGMSSpriteFromAseprite(filePath, ctx, observer) {
 
     let affectedSprites = getAffectedSprites(files);
     affectedSprites = affectedSprites.filter(spriteName => {
-      // TODO Should we warn if sprites don't exist?
-      return ctx.spriteDetails[spriteName] !== undefined;
+      if (ctx.spriteDetails[spriteName] !== undefined) return true;
+      console.log(yellow(`WARNING: ${spriteName} not found. Re-run conveyorbelt?`));
+      return false;
     });
 
     affectedSprites.forEach((spriteName) => {
@@ -262,7 +264,7 @@ function updateDimensionsInYY(pngFile, sprite, ctx) {
       ctx.spriteDetails[sprite.name].size.bbox.right = pngSize.width - 1;
       ctx.spriteDetails[sprite.name].size.bbox.bottom = pngSize.height - 1;
   } else {
-    console.log(`WARNING: Size of ${sprite.name} was updated but the bbox was not `)
+    console.log(red(`WARNING: Size of ${sprite.name} was updated but the bbox was not `));
   }
 }
 
