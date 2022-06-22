@@ -9,6 +9,12 @@
 
 ![conveyorbelt](https://user-images.githubusercontent.com/9491/174024453-55c428ad-69f7-48c0-b0c3-7943f82de76b.gif)
 
+## Installation
+You'll need to have [NPM](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) and [Node](https://nodejs.dev/learn/how-to-install-nodejs) to be able to install and run this tool. Once you have those installed run:
+
+```bash
+npm install @prtksxna/conveyorbelt
+```
 
 ## CLI Help
 ```

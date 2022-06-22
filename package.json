@@ -1,5 +1,5 @@
 {
-  "name": "conveyorbelt",
+  "name": "@prtksxna/conveyorbelt",
   "version": "0.1.0",
   "description": "Aseprite sprites to GameMaker",
   "main": "index.js",
