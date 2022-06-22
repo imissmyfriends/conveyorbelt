@@ -2,7 +2,10 @@
 
 > This tool is being developed for 🐟 Fishbowl, you can follow along on [Twitter](https://twitter.com/imissmy_friends).
 
-> **⚠️ Warning**: The tool fails if the exported file is a different size or if the number of frames in the animation changes.
+> **⚠️ Warning**: The tool doesn't work when the number of frames in an animation changes. 
+
+> **⚠️ Warning**: The tool isn't able to update the bounding box (collision map) of sprites that have a non-default bounding box. If you run the tool in `--verbose` it'll warn you about the sprites whose bounding box wasn't changed.
+
 
 ![conveyorbelt](https://user-images.githubusercontent.com/9491/174024453-55c428ad-69f7-48c0-b0c3-7943f82de76b.gif)
 
