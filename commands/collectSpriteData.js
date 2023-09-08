@@ -71,14 +71,14 @@ function parseSpriteJSON(json) {
 function getSpriteDetails(sprite) {
   if (sprite.frames.length === 1) {
     return {
-      imgName: sprite.frames[0].compositeImage.FrameId.name,
+      imgName: sprite.frames[0].name,
       layerName: sprite.layers[0].name,
       size: getSpriteSize(sprite),
       defaultBbox: hasDefaultBoundingBox(sprite)
     };
   } else {
     var imgNames = sprite.frames.map(frame => {
-      return frame.compositeImage.FrameId.name;
+      return frame.name;
     });
 
     return {
