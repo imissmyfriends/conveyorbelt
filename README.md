@@ -13,7 +13,13 @@
 You'll need to have [NPM](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) and [Node](https://nodejs.dev/learn/how-to-install-nodejs) to be able to install and run this tool. Once you have those installed run:
 
 ```bash
-npm install @prtksxna/conveyorbelt
+npm install -g @prtksxna/conveyorbelt
+```
+
+For local development clone the repository and then install it globally:
+
+```bash
+npm install -g .
 ```
 
 ## CLI Help
